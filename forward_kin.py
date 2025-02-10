@@ -1,22 +1,20 @@
 import numpy as np
 
 def franka_fk(q_degrees):
-    # Convert joint angles from degrees to radians
+    # converte o angulo das juntas para radianos
     q = np.deg2rad(q_degrees)
     
-    # Modified DH parameters for Franka Research 3/Panda (alpha, a, d, theta_offset)
-    # Source: Franka Documentation
+    # Matriz DH para o Franka Research 3
     dh_params = [
-        {'alpha': 0,      'a': 0,       'd': 0.333, 'theta_offset': 0},     # Joint 1
-        {'alpha': -np.pi/2, 'a': 0,       'd': 0,     'theta_offset': 0},     # Joint 2
-        {'alpha': np.pi/2,  'a': 0,       'd': 0.316, 'theta_offset': 0},     # Joint 3
-        {'alpha': np.pi/2,  'a': 0.0825,  'd': 0,     'theta_offset': 0},     # Joint 4
-        {'alpha': -np.pi/2, 'a': -0.0825, 'd': 0.384, 'theta_offset': 0},     # Joint 5
-        {'alpha': np.pi/2,  'a': 0,       'd': 0,     'theta_offset': 0},     # Joint 6
-        {'alpha': np.pi/2,  'a': 0.088,   'd': 0.107, 'theta_offset': 0},     # Joint 7
+        {'alpha': 0,        'a': 0,       'd': 0.333, 'theta_offset': 0},     # junta 1
+        {'alpha': -np.pi/2, 'a': 0,       'd': 0,     'theta_offset': 0},     # junta 2
+        {'alpha': np.pi/2,  'a': 0,       'd': 0.316, 'theta_offset': 0},     # junta 3
+        {'alpha': np.pi/2,  'a': 0.0825,  'd': 0,     'theta_offset': 0},     # junta 4
+        {'alpha': -np.pi/2, 'a': -0.0825, 'd': 0.384, 'theta_offset': 0},     # junta 5
+        {'alpha': np.pi/2,  'a': 0,       'd': 0,     'theta_offset': 0},     # junta 6
+        {'alpha': np.pi/2,  'a': 0.088,   'd': 0.107, 'theta_offset': 0},     # junta 7
     ]
     
-    # Initialize the transformation matrix (base to end-effector)
     T = np.eye(4)
     
     for i in range(7):
@@ -25,10 +23,10 @@ def franka_fk(q_degrees):
         d = dh_params[i]['d']
         theta_offset = dh_params[i]['theta_offset']
         
-        # Joint angle (theta = q[i] + offset)
+        # angulo da junta
         theta = q[i] + theta_offset
         
-        # Compute transformation matrix for the current joint
+        # Calcula a matriz de transformação de junta
         Ti = np.array([
             [np.cos(theta), -np.sin(theta), 0, a],
             [np.sin(theta)*np.cos(alpha), np.cos(theta)*np.cos(alpha), -np.sin(alpha), -d*np.sin(alpha)],
@@ -36,17 +34,17 @@ def franka_fk(q_degrees):
             [0, 0, 0, 1]
         ])
         
-        # Cumulative transformation
+        # faz a matriz junta pra base
         T = T @ Ti
     
-    # Extract position (x, y, z) and rotation matrix
-    position = T[:3, 3]
-    rotation = T[:3, :3]
+    # pegaa rotação de cada junta
+    posicao = T[:3, 3]
+    rotacao = T[:3, :3]
     
-    return position, rotation
+    return posicao, rotacao
 
-# Example usage:
-joint_angles = [0, 0, 0, 0, 0, 0, 0]  # All joints at 0 degrees (home position)
-position, rotation = franka_fk(joint_angles)
-print("End-effector position (meters):", position)
-print("Rotation matrix:\n", rotation)
+# Exemplo
+joint_angles = [0, 0, 0, 0, 0, 0, 0]  # posição em home
+posicao, rotacao = franka_fk(joint_angles)
+print("Posição do punho (meters):", posicao)
+print("Matriz de rotação:\n", rotacao)
