@@ -44,7 +44,7 @@ def franka_fk(q_degrees):
     return posicao, rotacao
 
 # Exemplo
-joint_angles = [0, 0, 0, 0, 0, 0, 0]  # posição em home
+joint_angles = [0, -0.785, 0, -2.356, 0, 1.571, 0.785]  # posição em home
 posicao, rotacao = franka_fk(joint_angles)
 print("Posição do punho (meters):", posicao)
 print("Matriz de rotação:\n", rotacao)
